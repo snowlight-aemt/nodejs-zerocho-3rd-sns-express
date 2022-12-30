@@ -82,9 +82,7 @@ app.use((err, req, res, next) => {
         // });    
 });
 
-app.listen(app.get('port'), () => {
-    console.log(app.get('port'), '번 포트에서 대기 중');
-})
+module.exports = app;
 
 
 // TODO
