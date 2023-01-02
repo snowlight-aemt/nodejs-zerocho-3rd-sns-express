@@ -6,6 +6,17 @@ COOKIE_SECRET=
 KAKAO_ID=
 ```
 
+## 부하 테스트
+```
+npm i -D artillery
+npx artillery quick --count 100 -n 50 http://localhost:8001
+```
+`loadtest.json` 시나리오
+```
+npx artillery run loadtest.json
+```
+
+
 ## TDD
 ### 단위 테스트를 위한 jest
 
