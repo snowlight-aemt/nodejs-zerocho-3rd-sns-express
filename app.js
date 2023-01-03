@@ -5,6 +5,8 @@ const path =  require('path');
 const session = require('express-session');
 const nunjucks = require('nunjucks');
 const passport = require('passport');
+const helmet = require('helmet');
+const hpp = require('hpp');
 const dotenv = require('dotenv');
 const { sequelize } = require('./models');
 
@@ -32,8 +34,20 @@ sequelize.sync({ force:true }) // 테이블 삭제 후 다시 생성
     .catch((err) => {
         console.error(err);
     });
+
+if (process.env.NODE_ENV === 'production') {
+    // 15장
+    app.use(helmet({
+        contentSecurityPolicy: false,
+        crossOriginEmbedderPolicy: false,
+        crossOriginResourcePolicy: false,
+    }));
+    app.use(hpp());
+} else {
+    // 6장 참고 미들웨어
+    app.use(morgan('dev')); // combined
+}
 // 6장 참고 미들웨어
-app.use(morgan('dev')); // combined
 app.use(express.static(path.join(__dirname, 'public'))); // static resource location
 app.use('/img', express.static(path.join(__dirname, 'uploads'))); // static resource location
 app.use(express.json());                            // json 요청 (req.body 를 ajax json 요청으로 부터)
