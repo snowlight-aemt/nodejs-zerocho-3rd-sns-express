@@ -7,10 +7,21 @@ const nunjucks = require('nunjucks');
 const passport = require('passport');
 const helmet = require('helmet');
 const hpp = require('hpp');
+const redis = require('redis');
+const RedisStore = require('connect-redis')(session);
+
 const dotenv = require('dotenv');
 const { sequelize } = require('./models');
 
 dotenv.config(); // 여기부터 사용할 수 있다. => (process.env.COOKIE_SECRET)
+
+const redisClient = redis.createClient({
+    url: `redis://${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+    password: process.env.REDIS_PASSWORD,
+    legacyMode: true,
+});
+redisClient.connect().catch(console.error);
+
 const pageRouter = require('./routes/page');
 const authRouter = require('./routes/auth');
 const postRouter = require('./routes/post');
@@ -60,7 +71,8 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: false,
-    }
+    },
+    store: new RedisStore({ client: redisClient }), // memory -> store 로 변경하여 Redis 에 세션값이 저장되게 수정.
 }));
 // passport 는 session 미들웨어 밑에서 생성해야만 한다. !!
 app.use(passport.initialize()); // req.user, req.login, req.isAuth.., req.logout
